@@ -43,7 +43,9 @@
         "wiki": "https://github.com/zoonman/linkedin-api-php-client/wiki"
     },
     "autoload": {
-        "psr-4": {"LinkedIn\\": "src/"}
+        "psr-4": {
+            "LinkedIn\\": "src/"
+        }
     },
     "require-dev": {
         "vlucas/phpdotenv": "~2.0",
@@ -60,5 +62,10 @@
             "phpunit.xml"
         ]
     },
-    "autoload-dev": {}
+    "autoload-dev": {},
+    "extra": {
+        "branch-alias": {
+            "dev-master": "as-linkedin-api-v2-dev"
+        }
+    }
 }
