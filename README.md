@@ -82,10 +82,9 @@ use LinkedIn\Scope;
 
 // define scope
 $scopes = [
-  Scope::READ_BASIC_PROFILE, 
-  Scope::READ_EMAIL_ADDRESS,
-  Scope::MANAGE_COMPANY,
-  Scope::SHARING,
+    Scope::READ_LITE_PROFILE,
+    Scope::READ_EMAIL_ADDRESS,
+    Scope::SHARING,
 ];
 $loginUrl = $client->getLoginUrl($scopes); // get url on LinkedIn to start linking
 ```
@@ -162,54 +161,56 @@ $client->delete('ENDPOINT');
 ##### Perform api call to get profile information
 
 ```php
-$profile = $client->get(
-    'people/~:(id,email-address,first-name,last-name)'
-);
+$profile = $client->get('me');
+// $profile = $client->get('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
 print_r($profile);
 ```
 
-##### List companies where you are an admin
+##### Create an Article or URL Share
 
-```php
-$profile = $client->get(
-    'companies',
-    ['is-company-admin' => true]
-);
-print_r($profile);
-```
-
-##### Share content on a personal profile
-
-Make sure that image URL is available from the Internet (don't use localhost in the image url).
+Make sure that original source URL is available from the Internet (don't use localhost in the original source URL).
 
 ```php
 $share = $client->post(
-    'people/~/shares',
+    'ugcPosts',
     [
-        'comment' => 'Checkout this amazing PHP SDK for LinkedIn!',
-        'content' => [
-            'title' => 'PHP Client for LinkedIn API',
-            'description' => 'OAuth 2 flow, composer Package',
-            'submitted-url' => 'https://github.com/zoonman/linkedin-api-php-client',
-            'submitted-image-url' => 'https://github.com/fluidicon.png',
+        'author' => "urn:li:person:{$profile['id']}",
+        'lifecycleState' => 'PUBLISHED',
+        'specificContent' => [
+            'com.linkedin.ugc.ShareContent' => [
+                // Share Comment
+                'shareCommentary' => [
+                    'text' => 'Welcome home to your beautiful, energy efficient home in Rancho Cabrillo! The popular Salerno floorplan has 3 spacious bedrooms PLUS a library, 2 baths and DOUBLE GATE.'
+                ],
+                'shareMediaCategory' => 'ARTICLE',
+                'media' => [
+                    [
+                        'status' => 'READY',
+    
+                        'description' => [
+                            'text' => 'Description: Check out my new listing at 13514 W DESERT MOON Way Peoria, AZ 85383!'
+                        ],
+    
+                        // Share article page URL
+                        'originalUrl' => 'https://www.propertyinaz.com/other-property-details/20190517205947477531000000',
+    
+                        // Share title
+                        'title' => [
+                            'text' => 'Welcome home to your beautiful, energy efficient home in Rancho Cabrillo'
+                        ]
+                    ]
+                ]
+            ],
         ],
         'visibility' => [
-            'code' => 'anyone'
+            'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC'
         ]
     ]
 );
 print_r($share);
 ```
 
-##### Get Company page profile
-
-```php
-$companyId = '123'; // use id of the company where you are an admin
-$companyInfo = $client->get('companies/' . $companyId . ':(id,name,num-followers,description)');
-print_r($companyInfo);
-```
-
-##### Share content on a LinkedIn business page
+##### Share content on a LinkedIn business page (Deprecated in v2)
 
 ```php
 // set sandboxed company page to work with
@@ -256,7 +257,7 @@ Some private API access there.
 $client->setApiRoot('https://api.linkedin.com/v2/');
 ```
 
-##### Image Upload
+##### Image Upload (Deprecated in v2)
 
 I assume you have to be LinkedIn partner or something like that.
 

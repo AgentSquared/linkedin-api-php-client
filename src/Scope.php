@@ -24,6 +24,11 @@ namespace LinkedIn;
 class Scope extends AbstractEnum
 {
     /**
+     * Required to retrieve name and photo for the authenticated user.
+     */
+    const READ_LITE_PROFILE  = 'r_liteprofile';
+
+    /**
      * Allows to read basic information about profile, such as name
      */
     const READ_BASIC_PROFILE = 'r_basicprofile';
@@ -34,14 +39,15 @@ class Scope extends AbstractEnum
     const READ_EMAIL_ADDRESS = 'r_emailaddress';
 
     /**
+     * Enables ability to share content on LinkedIn
+     */
+    const SHARING = 'w_member_social';
+
+    /**
      * Enables  to manage business company, retrieve analytics
      */
     const MANAGE_COMPANY = 'rw_company_admin';
 
-    /**
-     * Enables ability to share content on LinkedIn
-     */
-    const SHARING = 'w_share';
     /**
      * Manage and delete your data including your profile, posts, invitations, and messages
      */
