@@ -57,59 +57,46 @@ if (isset($_GET['code'])) { // we are returning back from LinkedIn with the code
             pp($accessToken); // print the access token content
             h1('Profile');
             // perform api call to get profile information
-            $profile = $client->get(
-                'people/~:(id,email-address,first-name,last-name)'
-            );
+            $profile = $client->get('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
             pp($profile); // print profile information
 
             $share = $client->post(
-                'people/~/shares',
+                'ugcPosts',
                 [
-                    'comment' => 'Checkout this amazing PHP SDK for LinkedIn!',
-                    'content' => [
-                        'title' => 'PHP Client for LinkedIn API',
-                        'description' => 'OAuth 2 flow, composer Package',
-                        'submitted-url' => 'https://github.com/zoonman/linkedin-api-php-client',
-                        'submitted-image-url' => 'https://github.com/fluidicon.png',
+                    'author' => "urn:li:person:{$profile['id']}",
+                    'lifecycleState' => 'PUBLISHED',
+                    'specificContent' => [
+                        'com.linkedin.ugc.ShareContent' => [
+                            // Share Comment
+                            'shareCommentary' => [
+                                'text' => 'Welcome home to your beautiful, energy efficient home in Rancho Cabrillo! The popular Salerno floorplan has 3 spacious bedrooms PLUS a library, 2 baths and DOUBLE GATE.'
+                            ],
+                            'shareMediaCategory' => 'ARTICLE',
+                            'media' => [
+                                [
+                                    'status' => 'READY',
+
+                                    'description' => [
+                                        'text' => 'Description: Check out my new listing at 13514 W DESERT MOON Way Peoria, AZ 85383!'
+                                    ],
+
+                                    // Share article page URL
+                                    'originalUrl' => 'https://www.propertyinaz.com/other-property-details/20190517205947477531000000',
+
+                                    // Share title
+                                    'title' => [
+                                        'text' => 'Welcome home to your beautiful, energy efficient home in Rancho Cabrillo'
+                                    ]
+                                ]
+                            ]
+                        ],
                     ],
                     'visibility' => [
-                        'code' => 'anyone'
+                        'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC'
                     ]
                 ]
             );
             pp($share);
-
-            // set sandboxed company page id to work with
-            // https://www.linkedin.com/company/devtestco
-            $companyId = '2414183';
-
-            h1('Company information');
-            $companyInfo = $client->get('companies/' . $companyId . ':(id,name,num-followers,description)');
-            pp($companyInfo);
-
-            h1('Sharing on company page');
-            $companyShare = $client->post(
-                'companies/' . $companyId . '/shares',
-                [
-                    'comment' =>
-                        sprintf(
-                            '%s %s just tried this amazing PHP SDK for LinkedIn!',
-                            $profile['firstName'],
-                            $profile['lastName']
-                        ),
-                    'content' => [
-                        'title' => 'PHP Client for LinkedIn API',
-                        'description' => 'OAuth 2 flow, composer Package',
-                        'submitted-url' => 'https://github.com/zoonman/linkedin-api-php-client',
-                        'submitted-image-url' => 'https://github.com/fluidicon.png',
-                    ],
-                    'visibility' => [
-                        'code' => 'anyone'
-                    ]
-                ]
-            );
-            pp($companyShare);
-            
 
             /*
             // Returns {"serviceErrorCode":100,"message":"Not enough permissions to access media resource","status":403}
@@ -142,11 +129,11 @@ if (isset($_GET['code'])) { // we are returning back from LinkedIn with the code
 } else {
     // define desired list of scopes
     $scopes = [
-        Scope::READ_BASIC_PROFILE,
+        Scope::READ_LITE_PROFILE,
         Scope::READ_EMAIL_ADDRESS,
-        Scope::MANAGE_COMPANY,
         Scope::SHARING,
     ];
+
     $loginUrl = $client->getLoginUrl($scopes); // get url on LinkedIn to start linking
     $_SESSION['state'] = $client->getState(); // save state for future validation
     $_SESSION['redirect_url'] = $client->getRedirectUrl(); // save redirect url for future validation

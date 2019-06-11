@@ -16,12 +16,14 @@
 
 namespace LinkedIn;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class ClientTest
  *
  * @package LinkedIn
  */
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
 
     /**

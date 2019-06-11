@@ -81,7 +81,7 @@ class Client
      * Default API root URL
      * string
      */
-    const API_ROOT = 'https://api.linkedin.com/v1/';
+    const API_ROOT = 'https://api.linkedin.com/v2/';
 
     /**
      * API Root URL
@@ -131,6 +131,7 @@ class Client
     protected $apiHeaders = [
         'Content-Type' => 'application/json',
         'x-li-format' => 'json',
+        'X-Restli-Protocol-Version' => '2.0.0',
     ];
 
     /**
@@ -308,10 +309,17 @@ class Client
      */
     public static function responseToArray($response)
     {
-        return \GuzzleHttp\json_decode(
-            $response->getBody()->getContents(),
-            true
-        );
+        if ( $contents = $response->getBody()->getContents() )
+        {
+            return \GuzzleHttp\json_decode($contents, true);
+        }
+
+        if ( $contents = $response->getHeaders() )
+        {
+            return $contents;
+        }
+
+        return [];
     }
 
     /**
@@ -399,9 +407,8 @@ class Client
      *
      * @return string
      */
-    public function getLoginUrl(
-        array $scope = [Scope::READ_BASIC_PROFILE, Scope::READ_EMAIL_ADDRESS]
-    ) {
+    public function getLoginUrl(array $scope = [Scope::READ_LITE_PROFILE, Scope::READ_EMAIL_ADDRESS])
+    {
         $params = [
             'response_type' => self::OAUTH2_RESPONSE_TYPE,
             'client_id' => $this->getClientId(),
@@ -409,8 +416,8 @@ class Client
             'state' => $this->getState(),
             'scope' => implode(' ', $scope),
         ];
-        $uri = $this->buildUrl('authorization', $params);
-        return $uri;
+
+        return $this->buildUrl('authorization', $params);
     }
 
     /**
