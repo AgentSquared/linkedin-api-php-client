@@ -1,5 +1,5 @@
 {
-    "name": "agentsquared/linkedin-api-php-client",
+    "name": "zoonman/linkedin-api-php-client",
     "description": "LinkedIn API PHP SDK with OAuth 2.0. Can be used for social sign in or sharing on LinkedIn. Examples. Documentation.",
     "type": "library",
     "keywords": [
@@ -62,10 +62,5 @@
             "phpunit.xml"
         ]
     },
-    "autoload-dev": {},
-    "extra": {
-        "branch-alias": {
-            "dev-master": "as-linkedin-api-v2"
-        }
-    }
+    "autoload-dev": {}
 }
